@@ -9,7 +9,7 @@ class SongList extends Component{
         if(songs){
             return this.props.data.songs.map((song, key) => {
                 return (
-                    <li key={key}>
+                    <li key={key} className={'collection-item'}>
                         {song.title}
                     </li>
                 )
@@ -19,9 +19,9 @@ class SongList extends Component{
     }
     render(){
         if(this.props.data.loading) { return <div>Loading....</div>}
-        return (<div>
+        return (<ul className={'collection'}>
             {this.renderSongs()}
-        </div>);
+        </ul>);
     }
 }
 
@@ -29,10 +29,6 @@ const query = gql`
 {
     songs {
         title
-        id
-        lyrics{
-          content
-        }
     }
 }
 `;
