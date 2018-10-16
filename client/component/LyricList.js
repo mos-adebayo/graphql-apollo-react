@@ -1,29 +1,28 @@
 import React, { Component } from 'react';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { Link } from 'react-router';
-import query from '../queries/fetchSongs';
 
 class LyricList extends Component{
-
-    onLike(id){
-        // e.preventDefault();
+    onLike(id, likes){
         this.props.mutate({
-            variables: {
-                id
+            variables: { id },
+            optimisticResponse: {
+                __typename: 'Mutation',
+                likeLyric: {
+                    id: id,
+                    __typename: 'LyricType',
+                    likes: likes + 1
+                }
             }
-        }).then((res)=>{
-            this.props.data.refetch();
-        }).catch((err)=>{
-            // console.log('Error', err);
-        })
+        });
     }
     renderLyrics(){
-        return this.props.lyrics.map(({id, content}, key) => {
+        return this.props.lyrics.map(({id, content, likes}, key) => {
             return (
-                <li key={key} className={'collection-item'}>
+                <li key={key} className={'collection-item vote-box'}>
                     {content}
-                    <i className={'material-icons'} onClick={() => this.onLike(id)}>thumb_up</i>
+                    <i className={'material-icons'} onClick={() => this.onLike(id, likes)}>thumb_up</i>
+                    {likes}
                 </li>
             )
         })
@@ -40,11 +39,11 @@ class LyricList extends Component{
 }
 
 const mutation = gql`
-mutation DeleteSong($id: ID) {
-    deleteSong(id: $id) {
-        id
-    }
-}`;
-export default graphql(mutation)(
-    graphql(query)(LyricList)
-);
+mutation LikeLyric($id: ID){
+  likeLyric(id: $id){
+    id
+    likes
+  }
+}
+`;
+export default graphql(mutation)(LyricList);
